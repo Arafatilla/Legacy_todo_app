@@ -40,6 +40,7 @@ class TodoList extends _$TodoList {
     await prefs.setString(_storageKey, jsonSting);
   }
 
+  // add a note method
   Future<void> addTodo(String description) async {
     final initialModel = state.value;
     if (initialModel == null) return;
@@ -72,6 +73,98 @@ class TodoList extends _$TodoList {
           transientFailure: () => e.toString(),
         ),
       );
+    }
+  }
+
+  // update a note method
+  Future<void> updateTodo(String id, String description, bool completed) async {
+    final initialModel = state.value;
+    if (initialModel == null) return;
+    state = AsyncData(initialModel.copyWith(status: TodoListStatus.updating));
+
+    try {
+      // simulating the API request time
+      await Future.delayed(const Duration(seconds: 1));
+      if (!ref.mounted) return;
+      final currentModel = state.value;
+      if (currentModel == null) return;
+      final updatedTodos = currentModel.todos.map((todo) {
+        if (todo.id == id) {
+          return Todo(
+            id: id,
+            description: description,
+            updatedAt: DateTime.now(),
+          );
+        }
+        return todo;
+      }).toList();
+      state = AsyncData(
+        currentModel.copyWith(
+          status: TodoListStatus.upadted,
+          todos: updatedTodos,
+        ),
+      );
+      await _saveToprefs(updatedTodos);
+    } catch (e) {
+      if (!ref.mounted) return;
+      final currentModel = state.value;
+      if (currentModel == null) return;
+      state = AsyncData(
+        currentModel.copyWith(
+          status: TodoListStatus.updateFailure,
+          transientFailure: () => e.toString(),
+        ),
+      );
+    }
+  }
+
+  // delete a note method
+  Future<void> deleteTodo(String id) async {
+    final initialModel = state.value;
+    if (initialModel == null) return;
+    state = AsyncData(initialModel.copyWith(deletingTodoId: () => id));
+
+    try {
+      // simulating the API request time
+      await Future.delayed(Duration(seconds: 1));
+      if (!ref.mounted) return;
+      final currentModel = state.value;
+      if (currentModel == null) return;
+      final updatedTodos = currentModel.todos.where((e) => e.id != id).toList();
+      state = AsyncData(
+        currentModel.copyWith(
+          status: TodoListStatus.deleted,
+          todos: updatedTodos,
+          deletingTodoId: () => null,
+        ),
+      );
+      await _saveToprefs(updatedTodos);
+    } catch (e) {
+      final currentModel = state.value;
+      if (currentModel == null) return;
+      state = AsyncData(
+        currentModel.copyWith(
+          status: TodoListStatus.deleteFailure,
+          transientFailure: () => e.toString(),
+          deletingTodoId: () => null,
+        ),
+      );
+    }
+  }
+
+  // method to clearTransientFailure and reset the state to loading
+
+  void clearTransientFailure() {
+    final currentModel = state.value;
+    if (currentModel != null && currentModel.transientFailure != null) {
+      // it means an error exists so =>
+      AsyncData(
+        currentModel.copyWith(
+          status: TodoListStatus.loaded,
+          deletingTodoId: () => null,
+        ),
+      );
+      // note here in this method we didn't use initial model and a !ref.mounted why because this method is sync not an async method
     }
   }
 }
