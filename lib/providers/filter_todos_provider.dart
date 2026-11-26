@@ -7,12 +7,12 @@ part 'filter_todos_provider.g.dart';
 
 @riverpod
 List<Todo> filteredTodos(Ref ref, String filter) {
-  final todosAsync = ref.watch(TodoListProvider);
-  final todos = todosAsync.value!.todos ?? [];
-  final sorted = [...todos]
-    ..sort((a, b) => b.updatedAt.CompareTo(a.updatedAt()));
+  final todosAsync = ref.watch(todoListProvider);
+  final todos = todosAsync.value?.todos ?? [];
+  final sorted = [...todos]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   return sorted.where((t) {
-    if (filter.completed) return t.completed;
-    if (filter.pending) return t.pending;
+    if (filter == 'completed') return t.completed;
+    if (filter == 'pending') return !t.completed;
+    return true;
   }).toList();
 }
