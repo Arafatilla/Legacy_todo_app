@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'todo legacy ',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: const Scaffold(),
+      home: const HomePage(),
     );
   }
 }
