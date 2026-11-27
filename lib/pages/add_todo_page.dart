@@ -27,14 +27,17 @@ class _AddTodoPageState extends ConsumerState<AddTodoPage> {
         switch (state.status) {
           case TodoListStatus.added:
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text("Todo added")));
+              ..hideCurrentSnackBar()
+              ..showSnackBar(const SnackBar(content: Text("Todo added")));
             Navigator.pop(context); // in order to return to the homePage
           case TodoListStatus.addFailure:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error : ${next.value!.transientFailure}'),
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text('Error : ${next.value!.transientFailure}'),
+                ),
+              );
             ref.read(todoListProvider.notifier).clearTransientFailure(); // this to prevent the snack bar from being displeid multiple times
           case _:
         }

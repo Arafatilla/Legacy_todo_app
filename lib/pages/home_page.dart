@@ -20,13 +20,17 @@ class HomePage extends ConsumerWidget {
         switch (state.status) {
           case TodoListStatus.deleted:
             ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text("Todo Deleted ")));
+              ..hideCurrentSnackBar() // this will make the UI update in the response to the   user's next action
+              ..showSnackBar(const SnackBar(content: Text("Todo Deleted ")));
+            ref.read(todoListProvider.notifier).clearStatus();
           case TodoListStatus.deleteFailure:
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text("Error : ${next.value!.transientFailure}"),
-              ),
-            );
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar
+              ..showSnackBar(
+                SnackBar(
+                  content: Text("Error : ${next.value!.transientFailure}"),
+                ),
+              );
             ref.watch(todoListProvider.notifier).clearTransientFailure();
           case _:
         }

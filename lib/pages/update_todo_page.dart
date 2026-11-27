@@ -38,15 +38,18 @@ class _UpdateTodoPageState extends ConsumerState<UpdateTodoPage> {
           case TodoListStatus.upadted:
             {
               ScaffoldMessenger.of(context)
-                  .showSnackBar(const SnackBar(content: Text("Todo Updated")));
+                ..hideCurrentSnackBar()
+                ..showSnackBar(const SnackBar(content: Text("Todo Updated")));
             }
           case TodoListStatus.updateFailure:
             {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Error : ${next.value!.transientFailure}'),
-                ),
-              );
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(
+                    content: Text('Error : ${next.value!.transientFailure}'),
+                  ),
+                );
               ref.read(todoListProvider.notifier).clearTransientFailure();
               // this is to prevent teh snackbar from being called multiple times when the state changes
             }
@@ -73,7 +76,7 @@ class _UpdateTodoPageState extends ConsumerState<UpdateTodoPage> {
               enabled: updateState.value?.status != TodoListStatus.updating,
             ),
             CheckboxListTile(
-              title: const Text(" Completed"),
+              title: const Text('Completed'),
               value: _completed,
               onChanged: (value) => setState(() {
                 _completed = value!;
@@ -87,6 +90,7 @@ class _UpdateTodoPageState extends ConsumerState<UpdateTodoPage> {
                       .read(todoListProvider.notifier)
                       .updateTodo(widget.todo.id, _controller.text, _completed);
                 }
+                Navigator.pop(context);
               },
               child: updateState.value?.status == TodoListStatus.updating
                   ? const CircularProgressIndicator()

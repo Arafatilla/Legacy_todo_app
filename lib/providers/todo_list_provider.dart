@@ -22,6 +22,7 @@ class TodoList extends _$TodoList {
               .map((json) => Todo.fromJson(json as Map<String, dynamic>))
               .toList();
     await Future.delayed(const Duration(seconds: 2));
+    // throw 'initial loading failure ';
     // We use jsonDecode() to convert the jsonString into a List<dynamic>.
     // Then, we use .map() to iterate over each element in the list.
     // Each element is a Map<String, dynamic>, which we convert into a
@@ -48,7 +49,7 @@ class TodoList extends _$TodoList {
 
     try {
       await Future.delayed(Duration(seconds: 1));
-
+      //throw 'addTodo failure ';
       if (!ref.mounted) return;
       final currentModel = state.value;
       if (currentModel == null) return;
@@ -77,7 +78,7 @@ class TodoList extends _$TodoList {
   }
 
   // update a note method
-  Future<void> updateTodo(String id, String description, bool completed) async {
+  Future<void> updateTodo(String id, String description, bool comp) async {
     final initialModel = state.value;
     if (initialModel == null) return;
     state = AsyncData(initialModel.copyWith(status: TodoListStatus.updating));
@@ -85,6 +86,7 @@ class TodoList extends _$TodoList {
     try {
       // simulating the API request time
       await Future.delayed(const Duration(seconds: 1));
+      // throw 'updateTodo failure ';
       if (!ref.mounted) return;
       final currentModel = state.value;
       if (currentModel == null) return;
@@ -93,6 +95,7 @@ class TodoList extends _$TodoList {
           return Todo(
             id: id,
             description: description,
+            completed: comp,
             updatedAt: DateTime.now(),
           );
         }
@@ -127,6 +130,7 @@ class TodoList extends _$TodoList {
     try {
       // simulating the API request time
       await Future.delayed(Duration(seconds: 1));
+      // throw 'deleteTodo failure ';
       if (!ref.mounted) return;
       final currentModel = state.value;
       if (currentModel == null) return;
@@ -165,6 +169,18 @@ class TodoList extends _$TodoList {
         ),
       );
       // note here in this method we didn't use initial model and a !ref.mounted why because this method is sync not an async method
+    }
+  }
+
+  void clearStatus() {
+    final currentModel = state.value;
+    if (currentModel != null) {
+      state = AsyncData(
+        currentModel.copyWith(
+          status: TodoListStatus.loaded,
+          transientFailure: () => null,
+        ),
+      );
     }
   }
 }
